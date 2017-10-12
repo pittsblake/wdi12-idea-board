@@ -1,33 +1,35 @@
-//Imports variables from .env file
-require ('dotenv').config()
-const express = require ('express')
+// Imports variables from .env file
+require('dotenv').config()
+const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 mongoose.Promise = global.Promise
-
-//Create new app using EXpress
+// Create a new app using express
 const app = express()
 
-mongoose.connect(process.env.MONGODB_URI, {useMongoClient: true})
+// Connect to MongoDB and set up messages for when 
+// Mongo connects successfully or errors out
+mongoose.connect(process.env.MONGODB_URI, { useMongoClient: true })
 const connection = mongoose.connection
 
 connection.on('connected', () => {
-    console.log("Successfully connected to MONGODB")
+  console.log('Successfully connected to MongoDB')
 })
 
 connection.on('error', (err) => {
-    console.log('MongoDB ERROR: ', err)
+  console.log('MongoDB Error: ', err)
 })
 
-
-//Inject middleware
+// Inject middleware
+app.use(express.static(`${__dirname}/client/build`))
 app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
-    res.send('Hello World')
+  res.sendFile(`${__dirname}/client/build/index.html`)
 })
 
+// Set the app to listen on a specific port
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-    console.log("App listening on port", PORT)
+  console.log('App listening on port: ', PORT)
 })
